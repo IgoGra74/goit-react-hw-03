@@ -1,42 +1,61 @@
-// const ContactForm = ({ addContact }) => {
-//   const handleSubmit = (e) => {
-//     e.preventDefault();
-//     addContact({
-//       id: Date.now(),
-//       text: e.target.elements.text.value,
-//     });
-//     e.target.reset();
-//   };
-//   return (
-//     <form onSubmit={handleSubmit}>
-//       <input type="name" name="name" />
-//       <input type="number" name="number" />
-//       <button type="submit">Add contact</button>
-//     </form>
-//   );
-// };
-
-// export default ContactForm;
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { nanoid } from "nanoid";
+import css from "./ContactForm.module.css";
 
 const ContactForm = ({ addContact }) => {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const newName = e.target.elements.name.value;
-    const newNumber = e.target.elements.number.value;
-    addContact({
-      id: Date.now(),
-      name: newName,
-      number: newNumber,
-    });
-    e.target.reset();
+  const initialValues = {
+    name: "",
+    number: "",
+  };
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string()
+      .required("Name is required")
+      .min(3, "Name must be at least 3 characters")
+      .max(50, "Name must not exceed 50 characters"),
+    number: Yup.string()
+      .required("Number is required")
+      .min(3, "Number must be at least 3 characters")
+      .max(50, "Number must not exceed 50 characters"),
+  });
+
+  const onSubmit = (values, actions) => {
+    const newContact = {
+      id: nanoid(),
+      name: values.name,
+      number: values.number,
+    };
+    addContact(newContact);
+    actions.resetForm();
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="text" name="name" placeholder="Name" />
-      <input type="text" name="number" placeholder="Number" />
-      <button type="submit">Add contact</button>
-    </form>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={onSubmit}
+    >
+      <Form>
+        <div className={css.group}>
+          <label htmlFor="name" className={css.label}>
+            Name
+          </label>
+          <Field className={css.field} type="text" id="name" name="name" />
+          <ErrorMessage name="name" component="div" />
+        </div>
+        <div className={css.group}>
+          <label htmlFor="number" className={css.label}>
+            Number
+          </label>
+          <Field className={css.field} type="text" id="number" name="number" />
+          <ErrorMessage name="number" component="div" />
+        </div>
+        <button className={css.addContact} type="submit">
+          Add contact
+        </button>
+      </Form>
+    </Formik>
   );
 };
 
