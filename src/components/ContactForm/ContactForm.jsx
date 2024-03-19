@@ -16,8 +16,10 @@ const ContactForm = ({ addContact }) => {
       .max(50, "Name must not exceed 50 characters"),
     number: Yup.string()
       .required("Number is required")
-      .min(3, "Number must be at least 3 characters")
-      .max(50, "Number must not exceed 50 characters"),
+      .matches(
+        /^[0-9]{3}-[0-9]{2}-[0-9]{2}$/,
+        "Invalid phone number format (e.g., 555-56-23)"
+      ),
   });
 
   const onSubmit = (values, actions) => {
